@@ -1,0 +1,277 @@
+{% load static %}
+{% include 'inc/header.html' %}
+
+<main class="container my-4 reception-dashboard">
+
+    <header class="dashboard-hero mb-4">
+        <div class="dashboard-hero__brand">
+            <img src="{% static 'img/walena-logo2.jpg' %}" alt="Hotel Walena" class="dashboard-logo">
+        </div>
+        <div class="dashboard-hero__copy">
+            <p class="dashboard-eyebrow mb-2"><span class="dashboard-live-dot"></span> Hotel Walena · Riohacha</p>
+            <h1 class="dashboard-title mb-1">Recepción</h1>
+            <p class="dashboard-subtitle mb-0">Control de habitaciones, reservas y huéspedes.</p>
+        </div>
+        <div class="dashboard-hero__summary">
+            <span>Hotel</span>
+            <strong>{{ total_habitaciones }} <small>habitaciones</small></strong>
+            <span>En 3 pisos</span>
+        </div>
+    </header>
+
+    <!-- Indicadores Métricos -->
+    <div class="dashboard-overview-title">
+        <span class="dashboard-overview-title__mark"><i class="bi bi-bar-chart-line-fill" aria-hidden="true"></i></span>
+                <div><p class="dashboard-eyebrow mb-1">Vista general</p><h2>Estado de las habitaciones</h2></div>
+    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg">
+            <div class="card border-0 shadow-sm h-100 rounded-3 dashboard-stat dashboard-stat--total">
+                <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="dashboard-stat__label">Habitaciones</span>
+                        <h2 class="dashboard-stat__value">{{ total_habitaciones }}</h2>
+                    </div>
+                    <div class="dashboard-stat__icon">
+                        <i class="bi bi-door-closed" aria-hidden="true"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg">
+            <div class="card border-0 shadow-sm h-100 rounded-3 dashboard-stat dashboard-stat--available">
+                <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="dashboard-stat__label">Disponibles</span>
+                        <h2 class="dashboard-stat__value">{{ disponibles }}</h2>
+                    </div>
+                    <div class="dashboard-stat__icon">
+                        <i class="bi bi-check-circle" aria-hidden="true"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg">
+            <div class="card border-0 shadow-sm h-100 rounded-3 dashboard-stat dashboard-stat--occupied">
+                <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="dashboard-stat__label">Ocupadas</span>
+                        <h2 class="dashboard-stat__value">{{ ocupadas }}</h2>
+                    </div>
+                    <div class="dashboard-stat__icon">
+                        <i class="bi bi-person-badge" aria-hidden="true"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg">
+            <div class="card border-0 shadow-sm h-100 rounded-3 dashboard-stat dashboard-stat--cleaning">
+                <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="dashboard-stat__label">En aseo</span>
+                        <h2 class="dashboard-stat__value">{{ en_aseo }}</h2>
+                    </div>
+                    <div class="dashboard-stat__icon">
+                        <i class="bi bi-brush" aria-hidden="true"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg">
+            <div class="card border-0 shadow-sm h-100 rounded-3 dashboard-stat dashboard-stat--maintenance">
+                <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="dashboard-stat__label">Mantenimiento</span>
+                        <h2 class="dashboard-stat__value">{{ en_mantenimiento }}</h2>
+                    </div>
+                    <div class="dashboard-stat__icon">
+                        <i class="bi bi-tools" aria-hidden="true"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Operaciones Rápidas -->
+    <div class="card border-0 shadow-sm rounded-3 p-3 mb-4 dashboard-quick-panel">
+        <div class="d-flex align-items-center mb-3">
+            <h2 class="dashboard-section-kicker mb-0">
+                <span class="dashboard-quick-panel__mark"><i class="bi bi-lightning-charge-fill" aria-hidden="true"></i></span>
+                Accesos rápidos
+            </h2>
+        </div>
+        <div class="row g-2">
+            <div class="col-6 col-md-3">
+                <a href="{% url 'disponibilidad' %}" class="dashboard-action dashboard-action--reserve h-100">
+                    <div class="dashboard-action__icon">
+                        <i class="bi bi-journal-plus"></i>
+                    </div>
+                    <span>Nueva Reserva</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{% url 'listar_reservas' %}" class="dashboard-action dashboard-action--checkin h-100">
+                    <div class="dashboard-action__icon">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                    </div>
+                    <span>Check-in</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{% url 'listar_reservas' %}" class="dashboard-action dashboard-action--checkout h-100">
+                    <div class="dashboard-action__icon">
+                        <i class="bi bi-box-arrow-left"></i>
+                    </div>
+                    <span>Check-out</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{% url 'listar_huespedes' %}" class="dashboard-action dashboard-action--guests h-100">
+                    <div class="dashboard-action__icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <span>Huéspedes</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estado de Habitaciones -->
+    <div class="dashboard-section-heading d-flex align-items-end justify-content-between mb-3">
+        <div>
+            <p class="dashboard-eyebrow mb-1">Inventario operativo</p>
+            <h2 class="dashboard-section-title mb-0">Habitaciones por piso</h2>
+            <p class="dashboard-section-description mb-0">Consulta disponibilidad y estado de cada habitación.</p>
+        </div>
+        <span class="dashboard-count-note"><i class="bi bi-grid-3x3-gap-fill me-1" aria-hidden="true"></i>{{ total_habitaciones }} habitaciones</span>
+    </div>
+
+    {% regroup habitaciones by piso as pisos %}
+    {% for piso in pisos %}
+        <section class="room-floor mb-4" aria-labelledby="titulo-piso-{{ piso.grouper }}">
+            <header class="room-floor__heading">
+                <span class="room-floor__number">{{ piso.grouper }}</span>
+                <div class="room-floor__title">
+                    <span>Nivel {{ piso.grouper }}</span>
+                    <h3 id="titulo-piso-{{ piso.grouper }}">{% if piso.grouper == 1 %}Primer piso{% elif piso.grouper == 2 %}Segundo piso{% else %}Tercer piso{% endif %}</h3>
+                </div>
+                <span class="room-floor__count">{{ piso.list|length }} habitaciones</span>
+                <span class="room-floor__rule"></span>
+            </header>
+            <div class="row g-3">
+            {% for hab in piso.list %}
+            <div class="col-12 col-sm-6 col-xl-4">
+                <article class="card border-0 shadow-sm h-100 position-relative room-card {% if hab.estado == 'DISPONIBLE' %}room-card--available{% elif hab.estado == 'OCUPADA' %}room-card--occupied{% elif hab.estado == 'MANTENIMIENTO' %}room-card--maintenance{% else %}room-card--cleaning{% endif %}">
+                    <div class="room-card__photo">
+                        <img src="{% static hab.ruta_imagen %}" alt="{{ hab.nombre_completo }}" loading="lazy">
+                    </div>
+                    <div class="card-body p-3 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                <div class="min-w-0">
+                                    <h3 class="room-card__title mb-1">{{ hab.nombre_completo }}</h3>
+                                    <span class="room-card__floor"><i class="bi bi-layers me-1" aria-hidden="true"></i>Piso {{ hab.piso }}</span>
+                                </div>
+                                <span class="badge px-2 py-1 fw-semibold text-uppercase room-card__status {% if hab.estado == 'DISPONIBLE' %}badge-estado-disponible{% elif hab.estado == 'OCUPADA' %}badge-estado-ocupada{% elif hab.estado == 'MANTENIMIENTO' %}badge-estado-mantenimiento{% else %}badge-estado-aseo{% endif %}">
+                                    {{ hab.get_estado_display|default:hab.estado }}
+                                </span>
+                            </div>
+
+                            <div class="room-card__details mb-3">
+                                <div>
+                                    <span>Capacidad</span>
+                                    <strong>{{ hab.tipo.capacidad }} personas</strong>
+                                </div>
+                                <div>
+                                    <span>Desde / noche</span>
+                                    <strong>${{ hab.tipo.precio_base_formateado }} COP</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            {% if hab.estado == 'DISPONIBLE' %}
+                                <a href="{% url 'crear_reserva' hab.id %}" class="btn btn-sm w-100 fw-bold shadow-sm btn-hab-disponible">
+                                    <i class="bi bi-plus-circle me-1"></i> Reservar
+                                </a>
+                            {% elif hab.estado == 'OCUPADA' %}
+                                {% if hab.reserva_activa %}
+                                    {% if hab.reserva_activa.estado == 'CHECKIN' %}
+                                        <!-- El huésped ya está en casa, puede consumir y hacer check-out -->
+                                        <div class="d-flex gap-1">
+                                            <a href="{% url 'agregar_servicio_reserva' hab.reserva_activa.id %}" class="btn btn-sm w-50 fw-bold shadow-sm btn-outline-primary" title="Cargar Consumo">
+                                                <i class="bi bi-cart-plus"></i> Consumo
+                                            </a>
+                                            <a href="{% url 'checkout' hab.reserva_activa.id %}" class="btn btn-sm w-50 fw-bold shadow-sm btn-warning text-dark" title="Check-out">
+                                                <i class="bi bi-box-arrow-left"></i> Salida
+                                            </a>
+                                        </div>
+                                    {% elif hab.reserva_activa.estado == 'CONFIRMADA' %}
+                                        <!-- La habitación está bloqueada, pero el huésped aún debe hacer Check-in -->
+                                        <a href="{% url 'checkin' hab.reserva_activa.id %}" class="btn btn-sm w-100 fw-bold shadow-sm btn-primary">
+                                            <i class="bi bi-box-arrow-in-right me-1"></i> Procesar Check-in
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="btn btn-sm w-100 btn-secondary disabled">Error: Ocupada sin Reserva</span>
+                                {% endif %}
+                            {% elif hab.estado == 'EN_ASEO' %}
+                                <div class="d-grid gap-2">
+                                    <form method="POST" action="{% url 'liberar_habitacion' hab.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="estado_destino" value="MANTENIMIENTO">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100 fw-semibold">
+                                            <i class="bi bi-tools me-1"></i> Reporte presencial: pasar a mantenimiento
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{% url 'liberar_habitacion' hab.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="estado_destino" value="DISPONIBLE">
+                                        <button type="submit" class="btn btn-sm btn-outline-success w-100 fw-semibold">
+                                            <i class="bi bi-check2-square me-1"></i> Aseo confirmado: disponible
+                                        </button>
+                                    </form>
+                                </div>
+                            {% else %}
+                                <form method="POST" action="{% url 'liberar_habitacion' hab.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="estado_destino" value="EN_ASEO">
+                                    <button type="submit" class="btn btn-sm btn-outline-warning w-100 fw-semibold">
+                                        <i class="bi bi-arrow-return-left me-1"></i> Reparación terminada: volver a aseo
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+            </div>
+            {% endfor %}
+            </div>
+        </section>
+    {% empty %}
+            <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-3 p-5 text-center dashboard-empty">
+                    <div class="mb-3">
+                        <div class="d-inline-flex p-3 rounded-circle icon-box-warning text-warning">
+                            <i class="bi bi-building-exclamation fs-1"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold mb-1">No hay habitaciones registradas</h5>
+                    <p class="text-muted small mb-3">
+                        Cuando se cargue el inventario, las habitaciones aparecerán aquí.
+                    </p>
+                    <div>
+                        <a href="/admin/" target="_blank" class="btn btn-sm text-white fw-semibold px-4 py-2 bg-dark rounded-2">
+                            <i class="bi bi-plus-circle me-1"></i> Ir al Panel Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+    {% endfor %}
+
+</main>
+
+{% include 'inc/footer.html' %}

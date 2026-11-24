@@ -1,0 +1,70 @@
+{% load static %}
+{% include 'inc/header.html' %}
+
+<div class="container my-4 reception-page reception-page--availability">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1"><i class="bi bi-calendar-check text-primary me-2"></i>Consultar Disponibilidad</h3>
+            <p class="text-muted small mb-0">Selecciona fechas, personas y extras para verificar las suites en tiempo real.</p>
+        </div>
+        <a href="{% url 'inicio' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i> Volver</a>
+    </div>
+
+    <!-- Buscador Avanzado -->
+    <div class="card border-0 shadow-sm rounded-3 p-4 mb-4 bg-white">
+        <form method="GET" action="{% url 'disponibilidad' %}" id="formDisponibilidad" class="row g-3 align-items-end">
+            <div class="col-12 col-md-3">
+                <label for="fecha_entrada" class="form-label fw-semibold text-dark small"><i class="bi bi-calendar-event text-primary"></i> Entrada</label>
+                <input type="date" class="form-control" id="fecha_entrada" name="fecha_entrada" value="{{ f_entrada }}" min="{{ hoy }}" required>
+            </div>
+            <div class="col-12 col-md-3">
+                <label for="fecha_salida" class="form-label fw-semibold text-dark small"><i class="bi bi-calendar-x text-danger"></i> Salida</label>
+                <input type="date" class="form-control" id="fecha_salida" name="fecha_salida" value="{{ f_salida }}" min="{{ f_entrada|default:hoy }}" required>
+            </div>
+            
+            <div class="col-12 col-md-2">
+                <label class="form-label fw-semibold text-dark small"><i class="bi bi-person text-success"></i> Adultos</label>
+                <input type="number" class="form-control" name="num_adultos" value="{{ num_adultos_form }}" min="1" required>
+            </div>
+            <div class="col-12 col-md-2">
+                <label class="form-label fw-semibold text-dark small"><i class="bi bi-emoji-smile text-info"></i> Niños (0-4a)</label>
+                <input type="number" class="form-control" name="num_ninos" value="{{ num_ninos_form }}" min="0" required>
+            </div>
+
+            <div class="col-12 col-md-2 text-center">
+                <button type="submit" class="btn btn-primary w-100 fw-bold mt-2"><i class="bi bi-search"></i> Buscar</button>
+            </div>
+        </form>
+        {% if error_fechas %}<div class="alert alert-danger mt-3 mb-0" role="alert">{{ error_fechas }}</div>{% endif %}
+        {% if error_ocupacion %}<div class="alert alert-danger mt-3 mb-0" role="alert">{{ error_ocupacion }}</div>{% endif %}
+    </div>
+
+    <!-- Resultados -->
+    <div class="row g-3 mb-4">
+        {% for hab in habitaciones %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="card shadow-sm border-0 rounded-3 h-100 p-2 bg-white">
+                    <div class="card-body p-3 d-flex flex-column justify-content-between">
+                        <div>
+                            <img src="{% static hab.ruta_imagen %}" class="img-fluid rounded-2 mb-3" style="height: 150px; width: 100%; object-fit: cover;">
+                            <h3 class="fw-bold mb-2 text-dark fs-5">{{ hab.nombre_completo }}</h3>
+                            
+                            <div class="p-2 rounded-2 mb-3 bg-light">
+                                <div class="d-flex justify-content-between mb-1"><span class="text-muted small">Capacidad:</span> <span class="fw-semibold text-dark small">{{ hab.tipo.capacidad }} Personas</span></div>
+                                <div class="d-flex justify-content-between mb-1"><span class="text-muted small">Tarifa Base (1 Pax):</span> <span class="fw-bold text-success small">${{ hab.tipo.precio_base_formateado }}</span></div>
+                                <div class="d-flex justify-content-between pt-1 border-top"><span class="text-muted extra-small">Adulto Extra:</span> <span class="text-secondary extra-small">+${{ hab.tipo.cargo_extra_formateado }}</span></div>
+                            </div>
+                        </div>
+                        <div>
+                            <a href="{% url 'crear_reserva' hab.id %}?fecha_entrada={{ f_entrada|urlencode }}&amp;fecha_salida={{ f_salida|urlencode }}&amp;num_adultos={{ num_adultos }}&amp;num_ninos={{ num_ninos }}&amp;trae_mascota={{ trae_mascota|yesno:'True,False' }}" 
+                                class="btn btn-sm btn-success w-100 fw-bold py-2"><i class="bi bi-journal-plus"></i> Reservar Suite</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12"><div class="card border-0 shadow-sm rounded-3 p-5 text-center bg-white"><h5 class="fw-bold text-dark">No hay habitaciones disponibles para estas fechas o capacidad</h5></div></div>
+        {% endfor %}
+    </div>
+</div>
+{% include 'inc/footer.html' %}

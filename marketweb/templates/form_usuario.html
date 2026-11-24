@@ -1,0 +1,102 @@
+{% load static %}
+{% include 'inc/header.html' %}
+
+<div class="container my-4 reception-page reception-page--user-form">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">
+                <i class="bi bi-person-gear text-primary me-2"></i>
+                {% if usuario_item %}Editar Usuario: {{ usuario_item.nombres }}{% else %}Registrar Nuevo Usuario{% endif %}
+            </h3>
+            <p class="text-muted small mb-0">Asigna los datos personales, rol y estado de la cuenta.</p>
+        </div>
+        <a href="{% url 'listar_usuarios' %}" class="btn btn-outline-secondary btn-sm rounded-2">
+            <i class="bi bi-arrow-left me-1"></i> Volver
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8">
+            <div class="card border-0 shadow-sm rounded-3 p-4 bg-white">
+                <form method="POST" action="{% if usuario_item %}{% url 'editar_usuario' usuario_item.id %}{% else %}{% url 'crear_usuario' %}{% endif %}">
+                    {% csrf_token %}
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags|default:'danger' }} alert-dismissible fade show small" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-semibold">Nombres</label>
+                            <input type="text" name="nombres" class="form-control" maxlength="80" required value="{% if datos %}{{ datos.nombres }}{% else %}{{ usuario_item.nombres }}{% endif %}">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-semibold">Apellidos</label>
+                            <input type="text" name="apellidos" class="form-control" maxlength="80" required value="{% if datos %}{{ datos.apellidos }}{% else %}{{ usuario_item.apellidos }}{% endif %}">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-semibold">Correo Electrónico</label>
+                            <input type="email" name="correo" class="form-control" maxlength="254" required value="{% if datos %}{{ datos.correo }}{% else %}{{ usuario_item.correo }}{% endif %}">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-semibold">
+                                Contraseña {% if usuario_item %}<span class="text-muted fw-normal">(Dejar en blanco para no cambiar)</span>{% endif %}
+                            </label>
+                            <div class="input-group">
+                                <input type="password" id="contrasena_usuario" name="contrasena" class="form-control" minlength="6" maxlength="128" {% if not usuario_item %}required{% endif %} autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+                                <button class="btn btn-outline-secondary" type="button" onclick="toggleVisibilidad('contrasena_usuario', 'icono_contrasena_usuario', this)" aria-label="Mostrar contraseña" aria-pressed="false">
+                                    <i class="bi bi-eye-slash" id="icono_contrasena_usuario" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-semibold">Rol del Usuario</label>
+                            <select name="rol" class="form-select" required>
+                                <option value="RECEPCIONISTA" {% if usuario_item.rol == 'RECEPCIONISTA' or datos.rol == 'RECEPCIONISTA' %}selected{% endif %}>Recepcionista</option>
+                                <option value="ADMIN_GERENTE" {% if usuario_item.rol == 'ADMIN_GERENTE' or datos.rol == 'ADMIN_GERENTE' %}selected{% endif %}>Administrador / Gerente</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6 d-flex align-items-center mt-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="activo" name="activo" 
+                                        {% if usuario_item %}{% if usuario_item.activo %}checked{% endif %}{% else %}checked{% endif %}>
+                                <label class="form-check-label small fw-semibold" for="activo">Usuario Activo</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm">
+                        <i class="bi bi-save me-1"></i> Guardar Usuario
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleVisibilidad(inputId, iconoId, boton) {
+        const campo = document.getElementById(inputId);
+        const icono = document.getElementById(iconoId);
+        const mostrar = campo.type === 'password';
+
+        campo.type = mostrar ? 'text' : 'password';
+        icono.classList.toggle('bi-eye', mostrar);
+        icono.classList.toggle('bi-eye-slash', !mostrar);
+        boton.setAttribute('aria-pressed', mostrar ? 'true' : 'false');
+        boton.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    }
+</script>
+
+{% include 'inc/footer.html' %}

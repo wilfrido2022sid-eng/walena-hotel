@@ -1,0 +1,556 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Walena | Riohacha, La Guajira</title>
+    
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-icons.css' %}">
+    <!-- AOS Animaciones -->
+    <link rel="stylesheet" href="{% static 'css/aos.css' %}">
+    <!-- Nuestro CSS Personalizado -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=33">
+</head>
+<body class="bg-light">
+
+<!-- 1. NAVBAR DINÁMICO -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-walena-dinamico py-3" id="mainNav">
+        <div class="container">
+            <!-- Logotipo oficial con animación de tamaño (Fondo transparente) -->
+            <a class="navbar-brand" href="#">
+                <span class="logo-circulo">
+                    <img src="{% static 'img/walena_logo.png' %}" alt="Hotel Walena" class="logo-transicion">
+                </span>
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto text-uppercase fw-semibold align-items-center" style="font-size: 0.85rem; letter-spacing: 1.5px;">
+                    <li class="nav-item px-1"><a class="nav-link nav-pill-active px-3 py-2 rounded-pill" href="#inicio">Inicio</a></li>
+                    <li class="nav-item px-1"><a class="nav-link text-white px-3 py-2 rounded-pill" href="{% url 'habitaciones' %}">Habitaciones</a></li>
+                    <li class="nav-item px-1"><a class="nav-link text-white px-3 py-2 rounded-pill" href="#servicios">Experiencia</a></li>
+                    <li class="nav-item px-1"><a class="nav-link text-white px-3 py-2 rounded-pill" href="#zonas">Zona</a></li>
+                    <li class="nav-item px-1"><a class="nav-link text-white px-3 py-2 rounded-pill" href="#contacto">Contacto</a></li>
+                    <!-- ACCESO AL PERSONAL -->
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. HERO: CARRUSEL DE HOTEL WALENA Y LA GUAJIRA -->
+    <header id="inicio" class="hero-palacete position-relative overflow-hidden">
+        <div id="heroCarousel" class="carousel slide carousel-fade hero-carousel" role="region" aria-roledescription="carrusel" aria-label="Imágenes de Hotel Walena">
+            <div class="carousel-inner h-100">
+                <div class="carousel-item active h-100" role="group" aria-roledescription="diapositiva" aria-label="1 de 3: atardecer en Riohacha">
+                    <img src="{% static 'img/atardecer.png' %}" alt="Atardecer sobre el mar en Riohacha" class="hero-carousel-img">
+                </div>
+                <div class="carousel-item h-100" role="group" aria-roledescription="diapositiva" aria-label="2 de 3: fachada de Hotel Walena">
+                    <img src="{% static 'img/casa-walena.jpg' %}" alt="Fachada de Hotel Walena en Riohacha" class="hero-carousel-img">
+                </div>
+                <div class="carousel-item h-100" role="group" aria-roledescription="diapositiva" aria-label="3 de 3: habitación de Hotel Walena">
+                    <img src="{% static 'img/habitaciones/6/01.jpg' %}" alt="Habitación de Hotel Walena preparada para una estadía" class="hero-carousel-img">
+                </div>
+            </div>
+
+            <div class="hero-shade" aria-hidden="true"></div>
+            <div class="hero-content container text-center" data-aos="zoom-in" data-aos-duration="1000">
+                <h1 class="hero-title mb-3">Tu descanso en La Guajira comienza aquí</h1>
+                <p class="hero-subtitle mb-4">Vive Riohacha y encuentra tu espacio para descansar.</p>
+                <a class="btn hero-booking-link" href="#zonas">
+                    <i class="bi bi-geo-alt me-2" aria-hidden="true"></i>Descubre Riohacha
+                </a>
+            </div>
+
+            <button class="carousel-control-prev hero-carousel-arrow" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Mostrar imagen anterior">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next hero-carousel-arrow" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Mostrar imagen siguiente">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+
+            <div class="carousel-indicators hero-carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Mostrar imagen 1"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Mostrar imagen 2"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Mostrar imagen 3"></button>
+            </div>
+            <button id="heroCarouselToggle" class="hero-carousel-toggle" type="button" aria-label="Pausar carrusel" aria-pressed="false">
+                <i class="bi bi-pause-fill" aria-hidden="true"></i>
+                <span class="visually-hidden">Pausar carrusel</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 3. MOTOR DE RESERVAS FLOTANTE -->
+    <div id="reserva" class="container reserva-container" hidden data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
+        <div class="reserva-flotante p-4 rounded-4 shadow-lg">
+            <form action="{% url 'disponibilidad' %}" method="GET" class="row g-3 align-items-end">
+                <div class="col-lg-3 col-md-6 text-start">
+                    <label class="text-white mb-2 fw-semibold small text-uppercase tracking-wide"><i class="bi bi-calendar-event text-walena-gold me-1"></i> Check In</label>
+                    <input type="date" name="fecha_entrada" class="form-control form-control-lg bg-transparent text-white border-secondary input-reserva" required>
+                </div>
+                <div class="col-lg-3 col-md-6 text-start">
+                    <label class="text-white mb-2 fw-semibold small text-uppercase tracking-wide"><i class="bi bi-calendar-check text-walena-gold me-1"></i> Check Out</label>
+                    <input type="date" name="fecha_salida" class="form-control form-control-lg bg-transparent text-white border-secondary input-reserva" required>
+                </div>
+                <div class="col-lg-3 col-md-6 text-start">
+                    <label class="text-white mb-2 fw-semibold small text-uppercase tracking-wide"><i class="bi bi-people text-walena-gold me-1"></i> Personas</label>
+                    <select name="num_adultos" class="form-select form-select-lg bg-transparent text-white border-secondary input-reserva">
+                        <option value="1" class="text-dark">1 Adulto</option>
+                        <option value="2" class="text-dark" selected>2 Adultos</option>
+                        <option value="3" class="text-dark">3 Adultos</option>
+                        <option value="4" class="text-dark">4 Adultos</option>
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <button type="submit" class="btn btn-walena-gold btn-lg w-100 fw-bold text-uppercase tracking-wide rounded-2 shadow">
+                        <i class="bi bi-search me-1"></i> Reservar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <!-- 4. MOSAICO VISUAL: RIOHACHA Y DESTINOS DE LA GUAJIRA -->
+    <section id="zonas" class="zonas-section">
+        <div class="container py-5">
+            <div class="riohacha-feature mb-4" data-aos="fade-up">
+                <div class="riohacha-feature__imagen">
+                    <img src="{% static 'img/riohacha-letras.avif' %}" alt="Marca turística de Riohacha" class="riohacha-feature__img">
+                </div>
+                <div class="riohacha-feature__texto">
+                    <p class="zonas-eyebrow">La Guajira te espera</p>
+                    <h2 class="zonas-heading">Descubre Riohacha y sus alrededores</h2>
+                    <div class="separador-dorado mt-3"></div>
+                    <p class="riohacha-feature__descripcion">Conoce Riohacha y déjate llevar por sus playas, paisajes y cultura. Explora algunos de los destinos que hacen especial a La Guajira.</p>
+                </div>
+            </div>
+
+            <div class="destinos-grid">
+                <article class="destino-card" data-lightbox-group="destinos" data-aos="fade-up" data-aos-delay="50">
+                    <img src="{% static 'img/punta-gallinas.webp' %}" alt="Paisaje de Punta Gallinas" class="destino-img">
+                    <h3 class="destino-titulo">Punta Gallinas</h3>
+                </article>
+                <article class="destino-card" data-lightbox-group="destinos" data-aos="fade-up" data-aos-delay="100">
+                    <img src="{% static 'img/Cabo de la vela.webp' %}" alt="Paisaje del Cabo de la Vela" class="destino-img">
+                    <h3 class="destino-titulo">Cabo de la Vela</h3>
+                </article>
+                <article class="destino-card" data-lightbox-group="destinos" data-aos="fade-up" data-aos-delay="150">
+                    <img src="{% static 'img/manaure.webp' %}" alt="Destino turístico de Manaure" class="destino-img">
+                    <h3 class="destino-titulo">Manaure</h3>
+                </article>
+                <article class="destino-card" data-lightbox-group="destinos" data-aos="fade-up" data-aos-delay="200">
+                    <img src="{% static 'img/Dos flamingos.jpg' %}" alt="Flamencos rosados de La Guajira" class="destino-img">
+                    <h3 class="destino-titulo">Flamencos Rosados</h3>
+                </article>
+                <article class="destino-card destino-card--wide" data-lightbox-group="destinos" data-aos="fade-up" data-aos-delay="250">
+                    <img src="{% static 'img/playa-mayapo.jpg' %}" alt="Playa de La Guajira" class="destino-img">
+                    <h3 class="destino-titulo">Playas de Mayapo</h3>
+                </article>
+                <article class="destino-card" data-lightbox-group="destinos" data-aos="fade-up" data-aos-delay="300">
+                    <img src="{% static 'img/playa-palomino.jpg' %}" alt="Playas de Palomino" class="destino-img">
+                    <h3 class="destino-titulo">Playas de Palomino</h3>
+                </article>
+                <article class="destino-card" data-lightbox-group="destinos" data-aos="fade-up" data-aos-delay="350">
+                    <img src="{% static 'img/cultura-wayuu.jpg' %}" alt="Rancherías y cultura Wayuu" class="destino-img">
+                    <h3 class="destino-titulo">Cultura Wayuu</h3>
+                </article>
+                <article class="destino-card" data-lightbox-group="destinos" data-aos="fade-up" data-aos-delay="400">
+                    <img src="{% static 'img/montes-de-oca.jpg' %}" alt="Paisaje de los Montes de Oca" class="destino-img">
+                    <h3 class="destino-titulo">Montes de Oca</h3>
+                </article>
+                <article class="destino-card destino-card--wide" data-lightbox-group="destinos" data-aos="fade-up" data-aos-delay="450">
+                    <img src="{% static 'img/ruta-vallenata.jpg' %}" alt="Ruta vallenata" class="destino-img">
+                    <h3 class="destino-titulo">Ruta Vallenata</h3>
+                </article>
+                <article class="destino-card" data-lightbox-group="destinos" data-aos="fade-up" data-aos-delay="500">
+                    <img src="{% static 'img/muelle-riohacha.jpg' %}" alt="Muelle de Riohacha" class="destino-img">
+                    <h3 class="destino-titulo">Muelle de Riohacha</h3>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. HABITACIONES -->
+    <section id="habitaciones" class="home-section habitaciones-section">
+        <div class="container py-5">
+            <div class="home-section-heading text-center" data-aos="fade-up">
+                <p class="zonas-eyebrow">Hotel Walena</p>
+                <h2 class="zonas-heading">Un espacio para descansar</h2>
+                <div class="separador-dorado mx-auto mt-3"></div>
+                <p class="home-section-intro">Conoce algunos de nuestros espacios y encuentra el ambiente ideal para tu visita a Riohacha.</p>
+            </div>
+
+            <div class="habitaciones-grid">
+                <article class="habitacion-card" data-lightbox-group="habitaciones-destacadas" data-aos="fade-up">
+                    <div class="habitacion-card__imagen">
+                        <img src="{% static 'img/habitaciones/6/01.jpg' %}" alt="Habitación Doble Deluxe con balcón de Hotel Walena" class="habitacion-card__img">
+                        <span class="habitacion-card__etiqueta">Doble Deluxe con balcón #6</span>
+                    </div>
+                    <div class="habitacion-card__contenido">
+                        <h3>Luz y descanso</h3>
+                        <p>Un espacio luminoso para descansar durante tu visita a Riohacha.</p>
+                    </div>
+                </article>
+                <article class="habitacion-card" data-lightbox-group="habitaciones-destacadas" data-aos="fade-up" data-aos-delay="100">
+                    <div class="habitacion-card__imagen">
+                        <img src="{% static 'img/habitaciones/9/01.jpg' %}" alt="Habitación Triple con vistas al jardín de Hotel Walena" class="habitacion-card__img">
+                        <span class="habitacion-card__etiqueta">Triple con vistas al jardín #9</span>
+                    </div>
+                    <div class="habitacion-card__contenido">
+                        <h3>Espacio para compartir</h3>
+                        <p>Una habitación amplia para disfrutar el viaje en compañía.</p>
+                    </div>
+                </article>
+                <article class="habitacion-card" data-lightbox-group="habitaciones-destacadas" data-aos="fade-up" data-aos-delay="200">
+                    <div class="habitacion-card__imagen">
+                        <img src="{% static 'img/habitaciones/1/01.jpg' %}" alt="Habitación Familiar Deluxe de Hotel Walena" class="habitacion-card__img">
+                        <span class="habitacion-card__etiqueta">Familiar Deluxe #1</span>
+                    </div>
+                    <div class="habitacion-card__contenido">
+                        <h3>Comodidad para tu estadía</h3>
+                        <p>Encuentra un lugar acogedor para hacer una pausa en La Guajira.</p>
+                    </div>
+                </article>
+            </div>
+            <div class="text-center mt-4" data-aos="fade-up">
+                <a class="btn btn-walena-outline" href="{% url 'habitaciones' %}">Ver todas las habitaciones <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i></a>
+            </div>
+        </div>
+    </section>
+
+        <!-- Servicios incluidos en la estadía -->
+    <section class="home-amenities-section" aria-labelledby="home-amenities-title">
+        <div class="container py-4 py-lg-5">
+            <div class="home-amenities-heading">
+                <p class="zonas-eyebrow">Incluido en tu estadía</p>
+                <h2 id="home-amenities-title">Comodidad en cada detalle</h2>
+            </div>
+            <ul class="home-amenities-grid">
+                <li class="home-amenity">
+                    <span class="home-amenity__icon"><i class="bi bi-cup-hot-fill" aria-hidden="true"></i></span>
+                    <span>Desayuno incluido</span>
+                </li>
+                <li class="home-amenity">
+                    <span class="home-amenity__icon"><i class="bi bi-thermometer-snow" aria-hidden="true"></i></span>
+                    <span>Aire acondicionado</span>
+                </li>
+                <li class="home-amenity">
+                    <span class="home-amenity__icon"><i class="bi bi-wifi" aria-hidden="true"></i></span>
+                    <span>WiFi</span>
+                </li>
+                <li class="home-amenity">
+                    <span class="home-amenity__icon"><i class="bi bi-tv-fill" aria-hidden="true"></i></span>
+                    <span>TV por cable</span>
+                </li>
+                <li class="home-amenity">
+                    <span class="home-amenity__icon"><i class="bi bi-cup-straw" aria-hidden="true"></i></span>
+                    <span>Minibar</span>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Opiniones auténticas resumidas desde Booking.com -->
+    <section class="home-reviews-section" aria-labelledby="home-reviews-title">
+        <div class="container py-5">
+            <div class="home-reviews-heading" data-aos="fade-up">
+                <p class="zonas-eyebrow">Experiencias de nuestros huéspedes</p>
+                <h2 id="home-reviews-title">Lo que cuentan de Walena</h2>
+                <p>Comentarios publicados por huéspedes en Booking.com, resumidos para que conozcas su experiencia.</p>
+            </div>
+
+            <div class="home-reviews-summary" data-aos="fade-up">
+                <div class="home-reviews-score">
+                    <span class="home-reviews-score__number">8,2</span>
+                    <span class="home-reviews-score__label">/ 10 en Booking.com</span>
+                    <span class="home-reviews-score__note">Puntuación general publicada en la ficha consultada</span>
+                </div>
+                <div class="home-reviews-highlights" aria-label="Aspectos destacados en Booking.com">
+                    <div><span>Personal</span><strong>8,9</strong></div>
+                    <div><span>Limpieza</span><strong>8,8</strong></div>
+                    <div><span>Ubicación</span><strong>8,8</strong></div>
+                </div>
+            </div>
+
+            <div class="home-reviews-grid">
+                <article class="home-review-card" data-aos="fade-up">
+                    <span class="home-review-card__icon" aria-hidden="true"><i class="bi bi-heart-fill"></i></span>
+                    <h3>Atención cercana</h3>
+                    <p>Los huéspedes resaltan la amabilidad y dedicación del personal durante su estadía.</p>
+                    <span class="home-review-card__source">Resumen de comentarios en Booking.com</span>
+                </article>
+                <article class="home-review-card" data-aos="fade-up" data-aos-delay="100">
+                    <span class="home-review-card__icon" aria-hidden="true"><i class="bi bi-cup-hot-fill"></i></span>
+                    <h3>Desayuno que gusta</h3>
+                    <p>En sus opiniones, varios viajeros destacan el sabor del desayuno y la atención del equipo.</p>
+                    <span class="home-review-card__source">Resumen de comentarios en Booking.com</span>
+                </article>
+                <article class="home-review-card" data-aos="fade-up" data-aos-delay="200">
+                    <span class="home-review-card__icon" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>
+                    <h3>Ubicación y limpieza</h3>
+                    <p>Los comentarios también valoran la limpieza del hotel y su ubicación para conocer Riohacha.</p>
+                    <span class="home-review-card__source">Resumen de comentarios en Booking.com</span>
+                </article>
+            </div>
+
+            <div class="text-center mt-4">
+                <a class="btn btn-walena-outline" href="https://www.booking.com/hotel/co/walena-hostel.es.html" target="_blank" rel="noopener noreferrer">
+                    Leer opiniones en Booking.com <i class="bi bi-box-arrow-up-right ms-2" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. EXPERIENCIA WALENA Y LA GUAJIRA -->
+    <section id="servicios" class="home-experiencia-section">
+        <div class="container py-5">
+            <div class="home-experiencia-panel" data-aos="fade-up">
+                <div class="home-experiencia-panel__texto">
+                    <p class="zonas-eyebrow">Vive el destino</p>
+                    <h2>La Guajira comienza en Riohacha</h2>
+                    <p>Descubre paisajes, playas y cultura durante tu visita. En Hotel Walena encuentras un punto de partida para explorar todo lo que esta región tiene por ofrecer.</p>
+                    <a class="btn btn-walena-gold" href="#zonas">Explorar destinos <i class="bi bi-arrow-down-right ms-2" aria-hidden="true"></i></a>
+                </div>
+                <div class="home-experiencia-panel__imagen">
+                    <img src="{% static 'img/muelle-riohacha.jpg' %}" alt="Muelle turístico de Riohacha al atardecer">
+                </div>
+            </div>
+
+            <div class="home-pilares-grid">
+                <article class="home-pilar" data-aos="fade-up">
+                    <span class="home-pilar__icono"><i class="bi bi-house-heart" aria-hidden="true"></i></span>
+                    <h3>Un lugar para descansar</h3>
+                    <p>Haz una pausa cómoda entre cada aventura por La Guajira.</p>
+                </article>
+                <article class="home-pilar" data-aos="fade-up" data-aos-delay="100">
+                    <span class="home-pilar__icono"><i class="bi bi-compass" aria-hidden="true"></i></span>
+                    <h3>Mucho por descubrir</h3>
+                    <p>Explora playas, paisajes naturales y lugares llenos de historia.</p>
+                </article>
+                <article class="home-pilar" data-aos="fade-up" data-aos-delay="200">
+                    <span class="home-pilar__icono"><i class="bi bi-geo-alt" aria-hidden="true"></i></span>
+                    <h3>En Riohacha</h3>
+                    <p>Conoce la capital de La Guajira y su entorno caribeño.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mapa de ubicación de Hotel Walena -->
+    <section id="mapa" class="home-map-section">
+        <div class="container py-5">
+            <div class="home-map-heading">
+                <div>
+                    <p class="zonas-eyebrow">Visítanos</p>
+                    <h2>Encuéntranos en Riohacha</h2>
+                    <p>Calle 14B Bis #15-05 · Riohacha, La Guajira</p>
+                </div>
+                <a class="home-map-directions" href="https://www.google.com/maps/search/?api=1&amp;query=Hotel%20Walena%2C%20Calle%2014B%20Bis%20%2315-05%2C%20Riohacha%2C%20La%20Guajira%2C%20Colombia" target="_blank" rel="noopener noreferrer">
+                    <i class="bi bi-geo-alt-fill" aria-hidden="true"></i> Abrir en Google Maps
+                </a>
+            </div>
+            <div class="home-map-frame">
+                <div class="home-map-offline" role="status" hidden>
+                    <span class="home-map-offline__marker" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>
+                    <div>
+                        <p class="home-map-offline__eyebrow">Hotel Walena</p>
+                        <h3>Estás viendo la página sin conexión</h3>
+                        <p>Guarda la dirección para encontrarnos: Calle 14B Bis #15-05, Riohacha, La Guajira.</p>
+                    </div>
+                </div>
+                <iframe
+                    src="https://maps.google.com/maps?q=Hotel%20Walena%2C%20Calle%2014B%20Bis%20%2315-05%2C%20Riohacha%2C%20La%20Guajira%2C%20Colombia&amp;z=16&amp;output=embed"
+                    title="Mapa de Hotel Walena en Riohacha, La Guajira"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Preguntas frecuentes: información práctica para planear la estadía -->
+    <section id="preguntas-frecuentes" class="home-faq-section" aria-labelledby="home-faq-title">
+        <div class="container py-5">
+            <div class="home-faq-heading" data-aos="fade-up">
+                <p class="zonas-eyebrow">Antes de tu visita</p>
+                <h2 id="home-faq-title">Preguntas frecuentes</h2>
+                <p>Respuestas rápidas para organizar tu estadía y tu viaje por La Guajira.</p>
+            </div>
+
+            <div class="home-faq-list" data-aos="fade-up">
+                <details class="home-faq-item">
+                    <summary>¿A qué hora puedo ingresar y a qué hora debo salir?<i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+                    <div class="home-faq-answer">
+                        <p>Booking.com publica el ingreso entre las 2:00 p. m. y las 3:00 p. m., y la salida entre las 11:30 a. m. y las 12:00 p. m. Si necesitas coordinar otro horario, consúltalo con el hotel antes de tu llegada.</p>
+                    </div>
+                </details>
+
+                <details class="home-faq-item">
+                    <summary>¿En qué horario se sirve el desayuno?<i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+                    <div class="home-faq-answer">
+                        <p>El hotel informa que ofrece desayuno de lunes a domingo, de 6:30 a. m. a 9:00 a. m. La tarifa publicada por Walena incluye desayuno.</p>
+                    </div>
+                </details>
+
+                <details class="home-faq-item">
+                    <summary>¿Cómo solicito una reserva por WhatsApp?<i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+                    <div class="home-faq-answer">
+                        <p>Envíanos las fechas, el número de personas y la habitación que buscas. Recepción revisará disponibilidad y te confirmará el precio y los pasos para completar la reserva. El envío del mensaje inicia la solicitud; espera la confirmación del hotel.</p>
+                    </div>
+                </details>
+
+                <details class="home-faq-item">
+                    <summary>¿Cómo encuentro la ubicación del hotel?<i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+                    <div class="home-faq-answer">
+                        <p>En el apartado <a href="#mapa">Encuéntranos en Riohacha</a>, selecciona “Abrir en Google Maps” para ver la ubicación y crear tu ruta.</p>
+                    </div>
+                </details>
+
+                <details class="home-faq-item">
+                    <summary>¿Puedo consultar planes turísticos por La Guajira?<i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+                    <div class="home-faq-answer">
+                        <p>Walena publica planes hacia destinos de La Guajira. Escríbenos por WhatsApp para preguntar qué opciones hay disponibles para tus fechas y conocer sus condiciones.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+
+    <a class="home-whatsapp-float"
+        href="https://wa.me/573128335638?text=Hola%20Hotel%20Walena%2C%20quiero%20consultar%20una%20reserva.%0AFecha%20de%20llegada%3A%20%0AFecha%20de%20salida%3A%20%0APersonas%3A%20%0ATipo%20de%20habitaci%C3%B3n%3A%20%0A%C2%BFMe%20confirman%20disponibilidad%2C%20precio%20y%20pasos%20para%20reservar%3F"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Consultar disponibilidad o solicitar una reserva por WhatsApp">
+        <i class="bi bi-whatsapp" aria-hidden="true"></i>   
+    </a>
+
+    <!-- 8. PIE DE PÁGINA -->
+    <footer class="home-footer">
+        <div class="container py-5">
+            <div class="home-footer__grid">
+                <section class="home-footer__brand" aria-label="Acerca de Hotel Walena">
+                    <a class="home-footer__marca" href="#inicio" aria-label="Hotel Walena, volver al inicio">
+                        <img src="{% static 'img/walena-logo2.jpg' %}" alt="Hotel Walena">
+                    </a>
+                    <p>Descansa en Riohacha y explora La Guajira desde Hotel Walena.</p>
+                </section>
+
+                <nav class="home-footer__column home-footer__enlaces" aria-label="Enlaces útiles">
+                    <h2>Enlaces útiles</h2>
+                    <a href="#inicio">Inicio</a>
+                    <a href="{% url 'habitaciones' %}">Habitaciones</a>
+                    <a href="#servicios">Experiencia</a>
+                    <a href="#zonas">Destinos</a>
+                    <a href="#preguntas-frecuentes">Preguntas frecuentes</a>
+                    <a href="#mapa">Ubicación</a>
+                </nav>
+
+                <section id="contacto" class="home-footer__column home-footer__contacto" aria-labelledby="home-footer-contacto-title">
+                    <h2 id="home-footer-contacto-title">Contáctanos</h2>
+                    <a href="tel:+576057292894"><i class="bi bi-telephone-fill" aria-hidden="true"></i><span>+57 605 729 2894</span></a>
+                    <a href="tel:+573128335638"><i class="bi bi-phone-fill" aria-hidden="true"></i><span>+57 312 833 5638</span></a>
+                    <a href="mailto:recepcionwalena@gmail.com"><i class="bi bi-envelope-fill" aria-hidden="true"></i><span>recepcionwalena@gmail.com</span></a>
+                    <a href="https://www.google.com/maps/search/?api=1&amp;query=Hotel%20Walena%2C%20Calle%2014B%20Bis%20%2315-05%2C%20Riohacha%2C%20La%20Guajira%2C%20Colombia" target="_blank" rel="noopener noreferrer"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i><span>Calle 14B Bis #15-05, Riohacha</span></a>
+                    <div class="home-footer__sociales" aria-label="Redes y mensajería">
+                        <a href="https://www.instagram.com/walenahotel/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Walena Hotel"><i class="bi bi-instagram" aria-hidden="true"></i></a>
+                        <a href="https://wa.me/573128335638" target="_blank" rel="noopener noreferrer" aria-label="Contactar a Walena Hotel por WhatsApp"><i class="bi bi-whatsapp" aria-hidden="true"></i></a>
+                    </div>
+                </section>
+
+                <a class="home-footer__booking" href="https://www.booking.com/hotel/co/walena-hostel.es.html" target="_blank" rel="noopener noreferrer" aria-label="Ver opiniones y calificación de Walena Hotel en Booking.com">
+                    <span class="home-footer__booking-card">
+                        <span class="home-footer__booking-marca">Booking.com</span>
+                        <strong>8,2</strong>
+                        <span>Muy bien</span>
+                        <small>Ver opiniones</small>
+                    </span>
+                </a>
+            </div>
+
+            <div class="home-footer__legal">© Hotel Walena · Riohacha, La Guajira</div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+    <script src="{% static 'js/aos.js' %}"></script>
+    <script src="{% static 'js/gallery_lightbox.js' %}?v=2"></script>
+    <script>
+        AOS.init({ once: true, offset: 80 });
+
+        const homeMapFrame = document.querySelector('.home-map-frame');
+        const homeMapFallback = document.querySelector('.home-map-offline');
+        function updateMapForConnection() {
+            const offline = !navigator.onLine;
+            homeMapFrame.classList.toggle('is-offline', offline);
+            homeMapFallback.hidden = !offline;
+        }
+        updateMapForConnection();
+        window.addEventListener('offline', updateMapForConnection);
+        window.addEventListener('online', updateMapForConnection);
+
+        const heroCarouselElement = document.getElementById('heroCarousel');
+        const heroCarouselToggle = document.getElementById('heroCarouselToggle');
+        const heroCarousel = new bootstrap.Carousel(heroCarouselElement, {
+            interval: 3000,
+            pause: 'hover',
+            touch: true,
+            wrap: true
+        });
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let heroCarouselPaused = prefersReducedMotion;
+
+        if (heroCarouselPaused) {
+            heroCarousel.pause();
+        } else {
+            heroCarousel.cycle();
+        }
+
+        function updateHeroCarouselToggle() {
+            const action = heroCarouselPaused ? 'Reanudar' : 'Pausar';
+            heroCarouselToggle.setAttribute('aria-label', `${action} carrusel`);
+            heroCarouselToggle.setAttribute('aria-pressed', heroCarouselPaused ? 'true' : 'false');
+            heroCarouselToggle.querySelector('i').className = heroCarouselPaused ? 'bi bi-play-fill' : 'bi bi-pause-fill';
+            heroCarouselToggle.querySelector('.visually-hidden').textContent = `${action} carrusel`;
+        }
+
+        updateHeroCarouselToggle();
+        heroCarouselToggle.addEventListener('click', () => {
+            heroCarouselPaused = !heroCarouselPaused;
+            if (heroCarouselPaused) heroCarousel.pause();
+            else heroCarousel.cycle();
+            updateHeroCarouselToggle();
+        });
+
+        const inputEntrada = document.querySelector('input[name="fecha_entrada"]');
+        const inputSalida = document.querySelector('input[name="fecha_salida"]');
+        const hoy = new Date().toISOString().split('T')[0];
+        inputEntrada.min = hoy;
+        inputEntrada.addEventListener('change', () => { 
+            inputSalida.min = inputEntrada.value; 
+            if(inputSalida.value < inputEntrada.value) inputSalida.value = inputEntrada.value;
+        });
+
+// Efecto Dinámico Navbar al hacer Scroll (El CSS reduce el logo automáticamente)
+        window.addEventListener('scroll', function() {
+            const nav = document.getElementById('mainNav');
+            
+            if (window.scrollY > 50) {
+                nav.classList.add('navbar-scrolled');
+            } else {
+                nav.classList.remove('navbar-scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

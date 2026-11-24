@@ -1,0 +1,107 @@
+{% load static %}
+{% include 'inc/header.html' %}
+
+<div class="container py-4 reception-page reception-page--checkin">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0 text-dark">Procesar Check-in — Reserva # {{ reserva.id }}</h2>
+            <p class="text-muted small mb-0">Verifique la información del huésped y registre el ingreso formal al hotel.</p>
+        </div>
+        <a href="{% url 'listar_reservas' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+
+    <form method="POST" class="card shadow-sm border-0">
+        {% csrf_token %}
+        <div class="card-body p-4">
+            
+            <!-- Resumen de la Habitación -->
+            <div class="alert alert-primary d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <strong>Habitación Asignada:</strong> {{ habitacion.nombre_completo }} · Piso {{ habitacion.piso }}
+                </div>
+                <div>
+                    <strong>Fechas:</strong> {{ reserva.fecha_entrada|date:"d/m/Y" }} al {{ reserva.fecha_salida|date:"d/m/Y" }}
+                </div>
+            </div>
+            <div id="checkin-acompanantes" class="mb-4" data-total="{{ reserva.num_huespedes }}"></div>
+
+            <h5 class="fw-bold text-primary mb-3"><i class="bi bi-person-vcard me-2"></i>1. Verificación del Huésped Principal</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Tipo Documento</label>
+                    <select name="tipo_documento" class="form-select" required>
+                        <option value="CC" {% if huesped.tipo_documento == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+                        <option value="CE" {% if huesped.tipo_documento == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
+                        <option value="PASAPORTE" {% if huesped.tipo_documento == 'PASAPORTE' %}selected{% endif %}>Pasaporte</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Número Documento</label>
+                    <input type="text" name="numero_documento" value="{{ huesped.numero_documento }}" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Nombres</label>
+                    <input type="text" name="nombres" value="{{ huesped.nombres }}" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Apellidos</label>
+                    <input type="text" name="apellidos" value="{{ huesped.apellidos }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Teléfono</label>
+                    <input type="text" name="telefono" value="{{ huesped.telefono }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Correo Electrónico</label>
+                    <input type="email" name="correo" value="{{ huesped.correo }}" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Nacionalidad</label>
+                    <input type="text" name="nacionalidad" value="{{ huesped.nacionalidad }}" class="form-control" required>
+                </div>
+            </div>
+
+            <hr>
+
+            <h5 class="fw-bold text-primary mb-3"><i class="bi bi-people me-2"></i>2. Ocupantes y Acompañantes</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Adultos</label>
+                    <input type="number" name="num_adultos" value="{{ form_data.num_adultos|default:reserva.num_adultos }}" min="1" max="{{ habitacion.tipo.capacidad }}" class="form-control" required>
+                </div>
+                <div class="col-md-4"><label class="form-label fw-semibold">Niños</label><input type="number" name="num_ninos" value="{{ form_data.num_ninos|default:reserva.num_ninos }}" min="0" max="{{ habitacion.tipo.capacidad }}" class="form-control" required><div class="form-text">Adultos y niños juntos: máximo {{ habitacion.tipo.capacidad }} personas.</div></div>
+            </div>
+
+            <hr>
+
+            <h5 class="fw-bold text-primary mb-3"><i class="bi bi-cash-coin me-2"></i>3. Registro de Anticipo / Garantía (Opcional)</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Monto del Anticipo (COP)</label>
+                    <input type="number" step="0.01" name="monto_anticipo" value="0" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Método de Pago</label>
+                    <select name="metodo_pago" class="form-select">
+                        <option value="EFECTIVO">Efectivo</option>
+                        <option value="DATAFONO">Tarjeta / Datáfono</option>
+                        <option value="TRANSFERENCIA">Transferencia bancaria</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-footer bg-light p-3 text-end">
+            <button type="submit" class="btn btn-success px-4 fw-bold">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Confirmar y Realizar Check-in
+            </button>
+        </div>
+    </form>
+</div>
+
+{% include 'inc/footer.html' %}
+<script>
+(()=>{const box=document.getElementById('checkin-acompanantes'),ad=document.querySelector('[name="num_adultos"]'),kids=document.querySelector('[name="num_ninos"]');if(!box||!ad||!kids)return;const draw=()=>{const n=Math.max(1,Number(ad.value||1)+Number(kids.value||0));box.innerHTML=n>1?'<h6 class="fw-bold">Datos de acompañantes (obligatorios)</h6>':'';for(let i=1;i<n;i++){let d=document.createElement('div');d.className='border rounded p-3 mb-2';d.innerHTML=`<strong>Acompañante ${i}</strong><div class="row g-2 mt-1"><div class="col-md-3"><select required name="acomp_${i}_tipo_documento" class="form-select"><option value="CC">Cédula</option><option value="CE">Cédula extranjería</option><option value="TI">Tarjeta identidad</option><option value="RC">Registro civil</option><option value="PASAPORTE">Pasaporte</option></select></div><div class="col-md-3"><input required name="acomp_${i}_numero_documento" class="form-control" placeholder="Documento"></div><div class="col-md-3"><input required name="acomp_${i}_nombres" class="form-control" placeholder="Nombre completo"></div><div class="col-md-3"><input required name="acomp_${i}_telefono" class="form-control" placeholder="Teléfono"></div><div class="col-md-6"><input type="email" name="acomp_${i}_correo" class="form-control" placeholder="Correo (opcional)"></div><div class="col-md-6"><input name="acomp_${i}_nacionalidad" class="form-control" value="Colombiana" placeholder="Nacionalidad"></div></div>`;box.append(d)}};[ad,kids].forEach(x=>x.addEventListener('input',draw));draw()})();
+</script>

@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7f8">
+    <title>Iniciar sesión | Hotel Walena</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-icons.css' %}">
+    <style>
+        :root { --walena-ink:#202428; --walena-teal:#087f8c; --walena-orange:#ec7b24; --walena-muted:#6d777e; }
+        * { box-sizing:border-box; }
+        body {
+            min-height:100vh; margin:0; display:grid; place-items:center; padding:28px 16px;
+            color:var(--walena-ink);
+            background:radial-gradient(ellipse at 12% 12%,rgba(8,127,140,.10),transparent 32%),radial-gradient(ellipse at 88% 88%,rgba(236,123,36,.10),transparent 30%),#f5f7f8;
+            font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+        }
+        .auth-card { width:min(100%,440px); padding:clamp(28px,7vw,42px); border:1px solid rgba(32,36,40,.07); border-radius:25px; background:#fff; box-shadow:0 24px 70px rgba(29,43,49,.12),0 3px 12px rgba(29,43,49,.04); }
+        .brand-logo { display:block; width:112px; height:112px; margin:0 auto 16px; border-radius:50%; object-fit:cover; box-shadow:0 8px 24px rgba(32,36,40,.10); }
+        .brand-name { margin:0; color:var(--walena-ink); font-size:1.55rem; font-weight:780; letter-spacing:-.04em; }
+        .brand-caption { margin:5px 0 27px; color:var(--walena-muted); font-size:.9rem; }
+        .form-label { margin-bottom:8px; color:#38434a; font-size:.84rem; font-weight:700; }
+        .form-label i { color:var(--walena-teal); }
+        .form-control { min-height:49px; border-color:#dce3e6; border-radius:12px; background:#fbfcfc; font-size:.94rem; }
+        .form-control:focus { border-color:var(--walena-teal); background:#fff; box-shadow:0 0 0 .22rem rgba(8,127,140,.13); }
+        .input-group .form-control { border-radius:12px 0 0 12px; }
+        .input-group .btn { min-width:50px; border-color:#dce3e6; border-radius:0 12px 12px 0; color:#657078; }
+        .forgot-link { color:var(--walena-teal); font-size:.86rem; font-weight:650; text-decoration:none; }
+        .forgot-link:hover { color:#066d78; text-decoration:underline; }
+        .btn-login { min-height:51px; border:0; border-radius:13px; background:var(--walena-teal); box-shadow:0 8px 18px rgba(8,127,140,.19); font-weight:750; transition:transform .18s ease,background .18s ease,box-shadow .18s ease; }
+        .btn-login:hover,.btn-login:focus-visible { background:#066d78; box-shadow:0 10px 22px rgba(8,127,140,.25); transform:translateY(-1px); }
+        .card-footer-note { margin-top:25px; padding-top:17px; border-top:1px solid #edf0f1; color:#879197; font-size:.73rem; letter-spacing:.035em; }
+        .alert-error { color:#842029; background:#f8d7da; border-color:#f5c2c7; }
+        @media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition-duration:.01ms!important; } }
+    </style>
+</head>
+<body>
+    <main class="auth-card">
+        <header class="text-center">
+            <img src="{% static 'img/walena-logo2.jpg' %}" alt="Hotel Walena" class="brand-logo">
+            <h1 class="brand-name">Hotel Walena</h1>
+            <p class="brand-caption">Sistema Operativo de Recepción</p>
+        </header>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags|default:'info' }}{% endif %} alert-dismissible fade show small" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'login' %}" autocomplete="off">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="identificador" class="form-label"><i class="bi bi-person-badge me-1"></i>Nombre o correo electrónico</label>
+                <input type="text" class="form-control" id="identificador" name="identificador" autocomplete="username" spellcheck="false" required autofocus>
+            </div>
+
+            <div class="mb-3">
+                <label for="contrasena" class="form-label"><i class="bi bi-lock me-1"></i>Contraseña</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="contrasena" name="contrasena" autocomplete="current-password" required>
+                    <button class="btn btn-outline-secondary" type="button" id="toggleContrasena" aria-label="Mostrar contraseña" aria-pressed="false">
+                        <i class="bi bi-eye-slash" id="iconoContrasena" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mb-4">
+                <a href="{% url 'recuperar_clave' %}" class="forgot-link">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-login w-100">
+                <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Iniciar sesión
+            </button>
+        </form>
+
+        <footer class="card-footer-note text-center">SysHSENA v1.0 · Acceso restringido</footer>
+    </main>
+
+    <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+    <script>
+        document.getElementById('toggleContrasena').addEventListener('click', function () {
+            const campo = document.getElementById('contrasena');
+            const icono = document.getElementById('iconoContrasena');
+            const mostrar = campo.type === 'password';
+            campo.type = mostrar ? 'text' : 'password';
+            icono.classList.toggle('bi-eye', mostrar);
+            icono.classList.toggle('bi-eye-slash', !mostrar);
+            this.setAttribute('aria-pressed', mostrar ? 'true' : 'false');
+            this.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        });
+    </script>
+</body>
+</html>

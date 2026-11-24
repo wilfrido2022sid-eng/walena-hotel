@@ -1,0 +1,193 @@
+{% load static %}
+{% include 'inc/header.html' %}
+
+<div class="container-fluid px-3 px-xxl-4 my-4 reception-page reception-page--booking" style="max-width:1740px">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1"><i class="bi bi-calendar-plus text-primary me-2"></i>Registrar Nueva Reserva</h3>
+            <p class="text-muted small mb-0">Completando datos para {{ habitacion.nombre_completo }}.</p>
+        </div>
+        <a href="{% url 'disponibilidad' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i> Volver</a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Resumen de la Estancia (Izquierda) -->
+        <div class="col-12 col-md-5 col-xl-5">
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+                {% if galeria_habitacion %}
+                <div id="galeriaReserva" class="carousel slide mb-3 room-booking-gallery" data-bs-interval="3000">
+                    <div class="carousel-inner rounded-3 overflow-hidden bg-dark position-relative">
+                        {% for foto in galeria_habitacion %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{% static foto %}"
+                                 alt="{{ habitacion.nombre_completo }} — foto {{ forloop.counter }}"
+                                 class="d-block w-100 mx-auto"
+                                 style="width:100%;height:auto;max-height:420px;object-fit:contain;cursor:zoom-in"
+                                 data-gallery-image>
+                        </div>
+                        {% endfor %}
+                        <span class="badge bg-dark bg-opacity-75 rounded-pill position-absolute top-0 end-0 m-2 px-3 py-1 small" style="z-index:2" data-room-counter>1 / {{ galeria_habitacion|length }}</span>
+                        <span class="badge bg-dark bg-opacity-75 rounded-pill position-absolute bottom-0 end-0 m-2 px-2 py-1 extra-small pointer-events-none" style="z-index:2"><i class="bi bi-arrows-fullscreen me-1"></i>Ampliar</span>
+                    </div>
+                    {% if galeria_habitacion|length > 1 %}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#galeriaReserva" data-bs-slide="prev" aria-label="Foto anterior">
+                        <span class="carousel-control-prev-icon p-3 rounded-circle bg-dark bg-opacity-50"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#galeriaReserva" data-bs-slide="next" aria-label="Foto siguiente">
+                        <span class="carousel-control-next-icon p-3 rounded-circle bg-dark bg-opacity-50"></span>
+                    </button>
+                    {% endif %}
+                    <div class="carousel-indicators position-static mt-2 mb-0" data-gallery-indicators>
+                        {% for foto in galeria_habitacion %}
+                        <button type="button" data-bs-target="#galeriaReserva" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-label="Ver imagen {{ forloop.counter }}" style="width:34px;height:4px;border:0;border-radius:5px;background-color:#0b8b83"></button>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="rounded-3 overflow-hidden bg-dark mb-3">
+                    <img src="{% static habitacion.ruta_imagen %}"
+                         alt="{{ habitacion.nombre_completo }}"
+                         class="d-block w-100 mx-auto"
+                         style="width:100%;height:auto;max-height:420px;object-fit:contain">
+                </div>
+                {% endif %}
+
+                <h5 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-door-open me-2"></i>{{ habitacion.nombre_completo }} · Piso {{ habitacion.piso }}</h5>
+                
+                {% if resumen_valido %}
+                <div class="d-flex justify-content-between mb-1"><span class="text-muted small">Check-in:</span> <span class="fw-bold small text-primary">{{ f_entrada }}</span></div>
+                <div class="d-flex justify-content-between mb-1"><span class="text-muted small">Check-out:</span> <span class="fw-bold small text-danger">{{ f_salida }}</span></div>
+                <div class="d-flex justify-content-between mb-1"><span class="text-muted small">Duración:</span> <span class="fw-bold small">{{ cant_noches }} noche(s)</span></div>
+
+                <div class="p-3 bg-light rounded-3 mt-3 border">
+                    <div class="text-muted extra-small mb-1 border-bottom pb-1">Cálculo de Tarifa Nocturna:</div>
+                    <div class="small text-muted d-flex justify-content-between"><span>Tarifa Base (1 Pax):</span><span>${{ habitacion.tipo.precio_base_formateado }}</span></div>
+                    {% if num_extras > 0 %}
+                        <div class="small text-muted d-flex justify-content-between"><span>+ Adicional ({{ num_extras }} Adultos):</span><span>${{ habitacion.tipo.cargo_extra_formateado }} c/u</span></div>
+                    {% endif %}
+                    {% if num_ninos > 0 %}
+                        <div class="small text-success d-flex justify-content-between"><span>+ {{ num_ninos }} Niños (Gratis):</span><span>$0</span></div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between mt-2 pt-2 border-top">
+                        <span class="fw-bold text-dark small">Valor noche final:</span><span class="fw-bold text-dark small">${{ tarifa_total_noche_fmt }} COP</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="fw-bold text-dark fs-6">Total Alojamiento:</span><span class="fw-bold text-success fs-5">${{ total_estancia_fmt }} COP</span>
+                    </div>
+                </div>
+
+                {% if exige_abono_50 %}
+                    <div class="alert alert-warning mt-3 mb-0 p-2 extra-small border-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i><strong>RN15:</strong> Abono requerido del 50% (${{ abono_sugerido_50_fmt }}).</div>
+                {% endif %}
+                {% else %}
+                <div class="alert alert-warning mb-0" role="status">{{ error_fechas|default:'Revisa las fechas y la cantidad de huéspedes para calcular la estancia.' }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Formulario Principal (Derecha) -->
+        <div class="col-12 col-md-7 col-xl-7">
+            <div class="card border-0 shadow-sm rounded-3 p-4 bg-white">
+                <form method="POST" action="{% url 'crear_reserva' habitacion.id %}">
+                    {% csrf_token %}
+                    <h5 class="fw-bold mb-3"><i class="bi bi-calendar3 text-primary me-2"></i>Fechas de la estancia</h5>
+                    <div class="row g-2 mb-4"><div class="col-md-6"><label class="form-label">Entrada</label><input type="date" name="fecha_entrada" class="form-control" min="{{ hoy|date:'Y-m-d' }}" value="{{ f_entrada }}" required></div><div class="col-md-6"><label class="form-label">Salida</label><input type="date" name="fecha_salida" class="form-control" min="{{ f_entrada|default:hoy }}" value="{{ f_salida }}" required></div></div>
+                    {% if error_fechas %}<div class="alert alert-danger py-2" role="alert">{{ error_fechas }}</div>{% endif %}
+
+                    <!-- Datos del Titular -->
+                    <h5 class="fw-bold mb-3"><i class="bi bi-person-vcard text-primary me-2"></i>1. Titular de la Reserva</h5>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-4"><select name="tipo_documento" class="form-select"><option value="CC" {% if form_data.tipo_documento == 'CC' or not form_data.tipo_documento %}selected{% endif %}>Cédula</option><option value="CE" {% if form_data.tipo_documento == 'CE' %}selected{% endif %}>Cédula Ext.</option><option value="PASAPORTE" {% if form_data.tipo_documento == 'PASAPORTE' %}selected{% endif %}>Pasaporte</option><option value="TI" {% if form_data.tipo_documento == 'TI' %}selected{% endif %}>Tarjeta identidad</option><option value="RC" {% if form_data.tipo_documento == 'RC' %}selected{% endif %}>Registro civil</option></select></div>
+                        <div class="col-md-8"><input type="text" name="numero_documento" class="form-control" placeholder="No. Documento" value="{{ form_data.numero_documento|default:'' }}" required></div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6"><input type="text" name="nombres" class="form-control" placeholder="Nombres" value="{{ form_data.nombres|default:'' }}" required></div>
+                        <div class="col-md-6"><input type="text" name="apellidos" class="form-control" placeholder="Apellidos" value="{{ form_data.apellidos|default:'' }}" required></div>
+                    </div>
+                    <div class="row g-2 mb-4">
+                        <div class="col-md-4"><input type="text" name="telefono" class="form-control" placeholder="Teléfono" value="{{ form_data.telefono|default:'' }}" required></div>
+                        <div class="col-md-4"><input type="email" name="correo" class="form-control" placeholder="Correo electrónico" value="{{ form_data.correo|default:'' }}" required></div>
+                        <div class="col-md-4"><input type="text" name="nacionalidad" class="form-control" value="{{ form_data.nacionalidad|default:'Colombiana' }}" required></div>
+                    </div>
+
+                    <!-- Configuradores -->
+                    <h5 class="fw-bold mb-3"><i class="bi bi-sliders text-primary me-2"></i>2. Detalles y Acompañantes</h5>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="small fw-bold">Adultos</label>
+                            <input type="number" id="inpAdultos" name="num_adultos" class="form-control" value="{{ num_adultos }}" min="1" max="{{ habitacion.tipo.capacidad }}" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small fw-bold">Niños</label>
+                            <input type="number" id="inpNinos" name="num_ninos" class="form-control" value="{{ num_ninos }}" min="0" max="{{ habitacion.tipo.capacidad }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small fw-bold">Canal de Origen</label>
+                            <select name="canal_reserva" class="form-select">
+                                <option value="PRESENCIAL" {% if form_data.canal_reserva == 'PRESENCIAL' or not form_data.canal_reserva %}selected{% endif %}>Presencial</option>
+                                <option value="DIRECTA" {% if form_data.canal_reserva == 'DIRECTA' %}selected{% endif %}>WhatsApp / Directo</option>
+                                <option value="BOOKING" {% if form_data.canal_reserva == 'BOOKING' %}selected{% endif %}>Booking.com</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor Dinámico Acompañantes (Generado por JS) -->
+                    <div id="contenedor-acompanantes" class="mb-3"></div>
+
+                    <!-- Mascotas y Notas -->
+                    <div class="row g-3 align-items-stretch mb-4">
+                        <div class="col-12 col-lg-4">
+                            <div class="pet-option h-100 d-flex align-items-center gap-3 px-3 py-2 bg-light border rounded-3">
+                                <div class="form-check form-switch m-0 flex-shrink-0">
+                                    <input class="form-check-input m-0" type="checkbox" role="switch" id="switchMascota" name="trae_mascota" {% if trae_mascota %}checked{% endif %}>
+                                </div>
+                                <label class="form-check-label fw-semibold mb-0" for="switchMascota"><span class="d-block">🐾 Viaja con mascota</span><small class="text-muted">Mascota pequeña</small></label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-8">
+                            <textarea name="notas" class="form-control h-100" rows="2" placeholder="Notas para recepción (llegada tarde, empresa o requerimientos)...">{{ form_data.notas|default:'' }}</textarea>
+                        </div>
+                        <div class="col-12"><div id="alertaMascota" class="small text-warning-emphasis {% if not trae_mascota %}d-none{% endif %}">Puede aplicarse un cargo adicional durante el check-in. Solo se permiten mascotas pequeñas.</div></div>
+                    </div>
+
+                    {% if exige_abono_50 or form_data.monto_abono %}
+                        <div class="card border-warning mb-4"><div class="card-body bg-warning bg-opacity-10">
+                            <h6 class="fw-bold mb-2 small"><i class="bi bi-cash-stack"></i> Registrar Abono (50%)</h6>
+                            <div class="row g-2">
+                                <div class="col-md-6"><input type="text" inputmode="numeric" name="monto_abono" class="form-control" value="{{ form_data.monto_abono|default:abono_sugerido_50 }}" {% if exige_abono_50 %}required{% endif %}></div>
+                                <div class="col-md-6"><select name="metodo_pago" class="form-select"><option value="TRANSFERENCIA" {% if form_data.metodo_pago == 'TRANSFERENCIA' or not form_data.metodo_pago %}selected{% endif %}>Transferencia/Nequi</option><option value="EFECTIVO" {% if form_data.metodo_pago == 'EFECTIVO' %}selected{% endif %}>Efectivo</option></select></div>
+                            </div>
+                        </div></div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2"><i class="bi bi-check-circle"></i> Guardar Reserva</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'inc/footer.html' %}
+{{ form_data_json|json_script:"reservation-post-data" }}
+<div class="modal fade" id="fotoCompleta" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-fullscreen"><div class="modal-content bg-dark"><div class="modal-header border-0"><span class="text-white" id="contadorFoto"></span><button class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button></div><div class="modal-body d-flex align-items-center justify-content-center position-relative"><button type="button" class="btn btn-light rounded-circle position-absolute start-0 ms-3" id="fotoAnterior" aria-label="Imagen anterior">‹</button><img id="fotoCompletaImg" class="img-fluid" style="max-height:88vh;max-width:90vw;object-fit:contain" alt="Foto de la habitación"><button type="button" class="btn btn-light rounded-circle position-absolute end-0 me-3" id="fotoSiguiente" aria-label="Imagen siguiente">›</button></div><div class="modal-footer justify-content-center border-0" id="lineasPantallaCompleta"></div></div></div></div>
+<script>
+(() => {
+ const carouselEl=document.getElementById('galeriaReserva'), modalEl=document.getElementById('fotoCompleta');
+ if(carouselEl){
+  const carousel=bootstrap.Carousel.getOrCreateInstance(carouselEl,{interval:3000,ride:'carousel',pause:'hover',wrap:true,touch:true});
+  const slides=[...carouselEl.querySelectorAll('.carousel-item')], fullImg=document.getElementById('fotoCompletaImg'), counter=document.getElementById('contadorFoto'), lines=document.getElementById('lineasPantallaCompleta');
+  let fullIndex=0, touchStartX=0; const roomCounter=carouselEl.querySelector('[data-room-counter]');
+  carouselEl.addEventListener('slid.bs.carousel',e=>{if(roomCounter)roomCounter.textContent=`${e.to+1} / ${slides.length}`});
+  const showFull=i=>{fullIndex=(i+slides.length)%slides.length;fullImg.src=slides[fullIndex].querySelector('img').src;counter.textContent=`${fullIndex+1} / ${slides.length}`;lines.querySelectorAll('button').forEach((b,n)=>b.classList.toggle('active',n===fullIndex));};
+  slides.forEach((slide,i)=>{const img=slide.querySelector('img');img.addEventListener('click',()=>{showFull(i);bootstrap.Modal.getOrCreateInstance(modalEl).show()});});
+  slides.forEach((_,i)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label',`Ver imagen ${i+1}`);b.className='border-0 rounded-pill mx-1';b.style.cssText='width:34px;height:4px;background:#8da2ad';b.addEventListener('click',()=>showFull(i));lines.append(b)});
+  document.getElementById('fotoAnterior').addEventListener('click',()=>showFull(fullIndex-1));document.getElementById('fotoSiguiente').addEventListener('click',()=>showFull(fullIndex+1));
+  modalEl.addEventListener('touchstart',e=>{touchStartX=e.changedTouches[0].screenX},{passive:true});modalEl.addEventListener('touchend',e=>{const dx=e.changedTouches[0].screenX-touchStartX;if(Math.abs(dx)>45)showFull(fullIndex+(dx<0?1:-1))},{passive:true});
+  modalEl.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')showFull(fullIndex-1);if(e.key==='ArrowRight')showFull(fullIndex+1)});
+ }
+ const adult=document.getElementById('inpAdultos'), kids=document.getElementById('inpNinos'), box=document.getElementById('contenedor-acompanantes'), cap=Number(adult?.max||1), saved=JSON.parse(document.getElementById('reservation-post-data')?.textContent||'{}');
+ const draw=()=>{if(!box)return;let total=Math.max(1,Number(adult.value||1)+Number(kids.value||0)); const old={};box.querySelectorAll('[name]').forEach(e=>old[e.name]=e.value); box.innerHTML=total>1?'<h6 class="fw-bold">Datos de acompañantes</h6>':'';
+  for(let i=1;i<total;i++){const d=document.createElement('div');d.className='border rounded-3 p-3 mb-2';d.innerHTML=`<strong>Acompañante ${i}</strong><div class="row g-2 mt-1"><div class="col-md-3"><select required class="form-select" name="acomp_${i}_tipo_documento"><option value="CC">Cédula</option><option value="CE">Cédula extranjería</option><option value="TI">Tarjeta identidad</option><option value="RC">Registro civil</option><option value="PASAPORTE">Pasaporte</option></select></div><div class="col-md-3"><input required class="form-control" name="acomp_${i}_numero_documento" placeholder="Documento"></div><div class="col-md-3"><input required class="form-control" name="acomp_${i}_nombres" placeholder="Nombre completo"></div><div class="col-md-3"><input required class="form-control" name="acomp_${i}_telefono" placeholder="Teléfono"></div><div class="col-md-5"><input type="email" class="form-control" name="acomp_${i}_correo" placeholder="Correo (opcional)"></div><div class="col-md-5"><input class="form-control" name="acomp_${i}_nacionalidad" value="Colombiana" placeholder="Nacionalidad"></div><div class="col-md-2 form-check ms-2"><input type="checkbox" class="form-check-input" name="acomp_${i}_es_menor"><label class="form-check-label">Menor</label></div></div>`;box.append(d);d.querySelectorAll('[name]').forEach(e=>{const value=old[e.name]??saved[e.name];if(value!==undefined)e.type==='checkbox'?e.checked=value==='on'||value===true:e.value=value});}
+ }; [adult,kids].forEach(e=>e?.addEventListener('input',draw));draw();
+})();
+</script>
