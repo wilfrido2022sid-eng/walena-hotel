@@ -65,26 +65,32 @@ TEMPLATES = [
 WSGI_APPLICATION = 'marketweb.wsgi.application'
 
 
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
-if os.environ.get("DATABASE_URL"):
+if DATABASE_URL and dj_database_url:
     DATABASES = {
-        "default": dj_database_url.config(
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
             conn_max_age=600,
-            ssl_require=not DEBUG,
+            ssl_require=True,
         )
     }
 else:
+    from django.db.backends.mysql.base import DatabaseWrapper
+    DatabaseWrapper.get_database_version = lambda self: (8, 4, 0)
+
     DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": os.environ.get("DB_NAME", "bdhotel"),
-            "USER": os.environ.get("DB_USER", "root"),
-            "PASSWORD": os.environ.get("DB_PASSWORD", "Sena101"),
-            "HOST": os.environ.get("DB_HOST", "localhost"),
-            "PORT": os.environ.get("DB_PORT", "3306"),
-            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+            "default": {
+                "ENGINE": "django.db.backends.mysql",
+                "NAME": os.environ.get("DB_NAME", "bdhotel"),
+                "USER": os.environ.get("DB_USER", "root"),
+                "PASSWORD": os.environ.get("DB_PASSWORD", "Sena101"),
+                "HOST": os.environ.get("DB_HOST", "localhost"),
+                "PORT": os.environ.get("DB_PORT", "3306"),
+                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+            }
         }
-    }
+
 
 
 AUTH_PASSWORD_VALIDATORS = [
