@@ -171,7 +171,7 @@ def enviar_factura_al_huesped(factura):
         f"Hola {factura.huesped_nombre}, aquí está el detalle de tu factura {factura.numero} "
         "por tu estancia en Hotel Walena. Puedes imprimir este correo desde tu bandeja."
     )
-    mensaje_html = render_to_string('emails/factura_estancia.html', contexto)
+    mensaje_html = render_to_string('emails/email_factura_estancia.html', contexto)
     enviados = enviar_correo_html_con_logo(
         f"Factura de alojamiento {factura.numero} — Hotel Walena",
         mensaje_plano,
@@ -225,7 +225,7 @@ def ver_factura_estancia(request, factura_id):
             messages.error(request, 'No se pudo enviar el correo. Revisa el correo registrado y la conexión de envío; puedes intentarlo nuevamente.')
         return redirect('factura_estancia', factura_id=factura.id)
 
-    return render(request, 'marketweb/factura_estancia.html', _contexto_factura(factura))
+    return render(request, 'facturas/factura_estancia_imprimible.html', _contexto_factura(factura))
 
 
 def _invalidar_sesion_desactualizada(request):
@@ -255,15 +255,15 @@ def landing_page(request):
             return redirect('inicio')
         if rol == 'CLIENTE':
             # Área privada del cliente pendiente; mientras tanto permanece en la web pública.
-            return render(request, 'index.html')
+            return render(request, 'publico/inicio_publico.html')
     
     # Si es un cliente normal, le mostramos la página bonita
-    return render(request, 'index.html')
+    return render(request, 'publico/inicio_publico.html')
 
 
 def vista_habitaciones(request):
     habitaciones = Habitacion.objects.select_related('tipo').order_by('numero')
-    return render(request, 'habitaciones.html', {'habitaciones': habitaciones})
+    return render(request, 'publico/catalogo_habitaciones.html', {'habitaciones': habitaciones})
 #endregion
 
 
@@ -298,7 +298,7 @@ def iniciar_sesion(request):
             return redirect('inicio')
         else:
             messages.error(request, "Credenciales incorrectas.")
-    return render(request, 'login.html')
+    return render(request, 'acceso/login.html')
 #endregion
 
 
@@ -329,7 +329,7 @@ def recuperar_clave(request):
             request.session['reset_codigo_creado_en'] = timezone.now().isoformat()
             
             # Cargar la plantilla HTML del correo desde el archivo separado
-            html_mensaje = render_to_string('emails/email_codigo.html', {
+            html_mensaje = render_to_string('emails/codigo_recuperacion.html', {
                 'usuario': usuario,
                 'codigo_otp': codigo_otp
             })
@@ -367,14 +367,14 @@ def recuperar_clave(request):
         )
         return redirect('verificar_codigo')
 
-    return render(request, 'recuperar_clave.html')
+    return render(request, 'acceso/recuperar_contrasena.html')
 
 
 def verificar_codigo(request):
     if 'reset_usuario_id' not in request.session or 'reset_codigo_otp' not in request.session:
         if request.method == 'POST':
             messages.error(request, "El código no es válido o venció. Solicita uno nuevo si necesitas continuar.")
-        return render(request, 'verificar_codigo.html')
+        return render(request, 'acceso/verificar_codigo_recuperacion.html')
 
     if codigo_recuperacion_vencido(request):
         limpiar_estado_recuperacion(request)
@@ -401,7 +401,7 @@ def verificar_codigo(request):
             mensajes_restantes = OTP_MAX_INTENTOS - intentos
             messages.error(request, f"Código incorrecto. Te quedan {mensajes_restantes} intento(s).")
 
-    return render(request, 'verificar_codigo.html', {
+    return render(request, 'acceso/verificar_codigo_recuperacion.html', {
         'correo': request.session.get('reset_correo')
     })
 
@@ -437,7 +437,7 @@ def restablecer_clave(request):
 
         # Enviar el correo de confirmación usando su propia plantilla HTML
         hora_cambio = datetime.now().strftime('%d/%m/%Y a las %I:%M %p')
-        html_confirmacion = render_to_string('emails/email_confirmacion.html', {
+        html_confirmacion = render_to_string('emails/aviso_contrasena_actualizada.html', {
             'usuario': usuario,
             'hora_cambio': hora_cambio
         })
@@ -460,7 +460,7 @@ def restablecer_clave(request):
         messages.success(request, "¡Tu contraseña ha sido restablecida exitosamente! Ya puedes iniciar sesión.")
         return redirect('login')
 
-    return render(request, 'restablecer_clave.html')
+    return render(request, 'acceso/restablecer_contrasena.html')
 #endregion
 
 
@@ -501,7 +501,7 @@ def cambiar_clave(request):
         request.session.flush()
         return redirect('login')
 
-    return render(request, 'cambiar_clave.html')
+    return render(request, 'acceso/cambiar_contrasena.html')
 #endregion
 
 
@@ -598,7 +598,7 @@ def inicio(request):
         'usuario_nombre': request.session.get('usuario_nombre'),
         'usuario_rol': request.session.get('usuario_rol'),
     }
-    return render(request, 'inicio.html', contexto)
+    return render(request, 'recepcion/panel_recepcion.html', contexto)
 #endregion
 
 
@@ -664,7 +664,7 @@ def consulta_disponibilidad(request):
         # No mostrar habitaciones como disponibles ante fechas inválidas.
         habitaciones_disponibles = habitaciones_disponibles.none()
 
-    return render(request, 'disponibilidad.html', {
+    return render(request, 'publico/disponibilidad.html', {
         'habitaciones': habitaciones_disponibles,
         'f_entrada': f_entrada,
         'f_salida': f_salida,
@@ -753,20 +753,20 @@ def crear_reserva(request, habitacion_id):
     if request.method == 'POST':
         if error_fechas:
             messages.error(request, error_fechas)
-            return render(request, 'crear_reserva.html', contexto_formulario)
+            return render(request, 'reservas/crear_reserva.html', contexto_formulario)
         if not cantidades_validas:
             messages.error(request, 'Ingresa una cantidad válida de adultos y niños.')
-            return render(request, 'crear_reserva.html', contexto_formulario)
+            return render(request, 'reservas/crear_reserva.html', contexto_formulario)
         if num_adultos < 1 or num_ninos < 0 or num_adultos + num_ninos > habitacion.tipo.capacidad:
             messages.error(request, f'La habitación admite hasta {habitacion.tipo.capacidad} huéspedes. Ajusta la ocupación.')
-            return render(request, 'crear_reserva.html', contexto_formulario)
+            return render(request, 'reservas/crear_reserva.html', contexto_formulario)
 
         numero_documento = request.POST.get('numero_documento', '').strip()
         nombres = request.POST.get('nombres', '').strip()
         apellidos = request.POST.get('apellidos', '').strip()
         if not all((numero_documento, nombres, apellidos, request.POST.get('telefono', '').strip(), request.POST.get('correo', '').strip())):
             messages.error(request, 'Completa los datos obligatorios del huésped principal.')
-            return render(request, 'crear_reserva.html', contexto_formulario)
+            return render(request, 'reservas/crear_reserva.html', contexto_formulario)
 
         datos_acompanantes, errores_acompanantes = _datos_acompanantes_post(request, num_adultos + num_ninos)
         documentos = [numero_documento] + [item['numero_documento'] for item in datos_acompanantes]
@@ -775,24 +775,24 @@ def crear_reserva(request, habitacion_id):
                 messages.error(request, error)
             if len(set(documentos)) != len(documentos):
                 messages.error(request, 'Cada persona debe tener un número de documento distinto.')
-            return render(request, 'crear_reserva.html', contexto_formulario)
+            return render(request, 'reservas/crear_reserva.html', contexto_formulario)
 
         try:
             monto_abono = _parse_cop(request.POST.get('monto_abono', '0'))
         except (InvalidOperation, ValueError):
             messages.error(request, 'El valor del abono no es válido.')
-            return render(request, 'crear_reserva.html', contexto_formulario)
+            return render(request, 'reservas/crear_reserva.html', contexto_formulario)
         if not monto_abono.is_finite() or monto_abono < 0 or monto_abono > total_estancia or (exige_abono_50 and monto_abono < abono_sugerido_50):
             messages.error(request, f'El abono debe ser al menos ${int(abono_sugerido_50):,} y no superar el total de la estancia.'.replace(',', '.'))
-            return render(request, 'crear_reserva.html', contexto_formulario)
+            return render(request, 'reservas/crear_reserva.html', contexto_formulario)
         metodo_pago_abono = request.POST.get('metodo_pago', 'TRANSFERENCIA')
         if monto_abono > 0 and metodo_pago_abono not in dict(Pago.METODOS):
             messages.error(request, 'Selecciona un método de pago válido.')
-            return render(request, 'crear_reserva.html', contexto_formulario)
+            return render(request, 'reservas/crear_reserva.html', contexto_formulario)
 
         if not _habitacion_admite_fechas(habitacion, d_entrada, d_salida):
             messages.error(request, 'La habitación ya no está disponible para esas fechas. Selecciona otras fechas o una habitación distinta.')
-            return render(request, 'crear_reserva.html', contexto_formulario)
+            return render(request, 'reservas/crear_reserva.html', contexto_formulario)
 
         with transaction.atomic():
             # Serialize reservations for this room so two simultaneous requests
@@ -800,7 +800,7 @@ def crear_reserva(request, habitacion_id):
             habitacion = Habitacion.objects.select_for_update().select_related('tipo').get(pk=habitacion.pk)
             if not _habitacion_admite_fechas(habitacion, d_entrada, d_salida):
                 messages.error(request, 'La habitación ya fue reservada para esas fechas. Elige otra opción.')
-                return render(request, 'crear_reserva.html', contexto_formulario)
+                return render(request, 'reservas/crear_reserva.html', contexto_formulario)
 
             huesped, _ = Huesped.objects.update_or_create(
                 numero_documento=numero_documento,
@@ -845,7 +845,7 @@ def crear_reserva(request, habitacion_id):
         messages.success(request, f'Reserva #{reserva.id} confirmada. La habitación figurará ocupada al registrar el check-in.')
         return redirect('inicio')
 
-    return render(request, 'crear_reserva.html', contexto_formulario)
+    return render(request, 'reservas/crear_reserva.html', contexto_formulario)
 #endregion
 
 
@@ -877,7 +877,7 @@ def registrar_checkin(request, reserva_id):
         datos = {campo: request.POST.get(campo, '').strip() for campo in campos}
         if not all(datos.values()):
             messages.error(request, 'Completa todos los datos obligatorios del huésped principal.')
-            return render(request, 'checkin/form_checkin.html', {'reserva': reserva, 'huesped': huesped, 'habitacion': reserva.habitacion, 'form_data': form_data})
+            return render(request, 'recepcion/checkin/registrar_checkin.html', {'reserva': reserva, 'huesped': huesped, 'habitacion': reserva.habitacion, 'form_data': form_data})
         try:
             adultos = int(request.POST.get('num_adultos', reserva.num_adultos))
             ninos = int(request.POST.get('num_ninos', reserva.num_ninos))
@@ -886,7 +886,7 @@ def registrar_checkin(request, reserva_id):
         cantidad = adultos + ninos
         if adultos < 1 or ninos < 0 or cantidad > reserva.habitacion.tipo.capacidad:
             messages.error(request, f'La ocupación no es válida. Ingresa al menos un adulto y no superes los {reserva.habitacion.tipo.capacidad} huéspedes permitidos para esta habitación.')
-            return render(request, 'checkin/form_checkin.html', {'reserva': reserva, 'huesped': huesped, 'habitacion': reserva.habitacion, 'form_data': form_data})
+            return render(request, 'recepcion/checkin/registrar_checkin.html', {'reserva': reserva, 'huesped': huesped, 'habitacion': reserva.habitacion, 'form_data': form_data})
         try:
             monto_anticipo = _parse_cop(request.POST.get('monto_anticipo', '0'))
             metodo_pago = request.POST.get('metodo_pago', 'EFECTIVO')
@@ -900,7 +900,7 @@ def registrar_checkin(request, reserva_id):
                 raise ValueError
         except (ValueError, InvalidOperation):
             messages.error(request, 'Revisa el número de huéspedes, el monto y el método de pago.')
-            return render(request, 'checkin/form_checkin.html', {'reserva': reserva, 'huesped': huesped, 'habitacion': reserva.habitacion, 'form_data': form_data})
+            return render(request, 'recepcion/checkin/registrar_checkin.html', {'reserva': reserva, 'huesped': huesped, 'habitacion': reserva.habitacion, 'form_data': form_data})
 
         with transaction.atomic():
             reserva = Reserva.objects.select_for_update().select_related('habitacion__tipo', 'huesped').get(pk=reserva_id)
@@ -942,7 +942,7 @@ def registrar_checkin(request, reserva_id):
         return redirect('inicio')
 
     # Ajustado a 'checkin/form_checkin.html' (asegúrate de renombrar la carpeta en VS Code a 'checkin')
-    return render(request, 'checkin/form_checkin.html', {
+    return render(request, 'recepcion/checkin/registrar_checkin.html', {
         'reserva': reserva,
         'huesped': huesped,
         'habitacion': reserva.habitacion
@@ -1015,12 +1015,12 @@ def registrar_checkout(request, reserva_id):
                 raise InvalidOperation
         except (InvalidOperation, ValueError):
             messages.error(request, 'Escribe un monto válido, entre $0 y $99.999.999,99, con máximo dos decimales.')
-            return render(request, 'checkout.html', contexto)
+            return render(request, 'recepcion/cerrar_estancia.html', contexto)
 
         metodo_pago = request.POST.get('metodo_pago', 'EFECTIVO')
         if monto_pago > 0 and metodo_pago not in dict(Pago.METODOS):
             messages.error(request, 'Selecciona un método de pago válido.')
-            return render(request, 'checkout.html', contexto)
+            return render(request, 'recepcion/cerrar_estancia.html', contexto)
 
         with transaction.atomic():
             reserva = Reserva.objects.select_for_update().select_related('huesped', 'habitacion__tipo').get(pk=reserva_id)
@@ -1037,10 +1037,10 @@ def registrar_checkout(request, reserva_id):
             saldo_pendiente = calculos['saldo_pendiente']
             if monto_pago != saldo_pendiente:
                 messages.error(request, 'Para completar el check-out, registra exactamente el saldo pendiente mostrado.')
-                return render(request, 'checkout.html', contexto)
+                return render(request, 'recepcion/cerrar_estancia.html', contexto)
             if monto_pago > 0 and metodo_pago not in dict(Pago.METODOS):
                 messages.error(request, 'Selecciona un método de pago válido.')
-                return render(request, 'checkout.html', contexto)
+                return render(request, 'recepcion/cerrar_estancia.html', contexto)
 
             if monto_pago > 0:
                 Pago.objects.create(reserva=reserva, monto=monto_pago, metodo_pago=metodo_pago)
@@ -1137,7 +1137,7 @@ def registrar_checkout(request, reserva_id):
 
         return redirect('factura_estancia', factura_id=factura.id)
 
-    return render(request, 'checkout.html', contexto)
+    return render(request, 'recepcion/cerrar_estancia.html', contexto)
 #endregion
 
 
@@ -1166,7 +1166,7 @@ def listar_reservas(request):
             Q(habitacion__numero__icontains=busqueda)
         )
 
-    return render(request, 'reservas.html', {
+    return render(request, 'recepcion/listado_reservas.html', {
         'reservas': reservas,
         'estado_filtro': estado_filtro,
         'busqueda': busqueda
@@ -1222,7 +1222,7 @@ def editar_reserva(request, reserva_id):
             error_fechas = 'La fecha de salida debe ser posterior a la fecha de entrada.'
         if error_fechas:
             messages.error(request, error_fechas)
-            return render(request, 'editar_reserva.html', contexto_edicion(error_fechas))
+            return render(request, 'reservas/editar_reserva.html', contexto_edicion(error_fechas))
 
         try:
             adultos = int(request.POST.get('num_adultos', ''))
@@ -1232,17 +1232,17 @@ def editar_reserva(request, reserva_id):
                 raise ValueError
         except (TypeError, ValueError):
             messages.error(request, 'Revisa la cantidad de adultos y niños; debe ser válida y no superar la capacidad de la habitación.')
-            return render(request, 'editar_reserva.html', contexto_edicion())
+            return render(request, 'reservas/editar_reserva.html', contexto_edicion())
         if not _habitacion_admite_fechas(
             reserva.habitacion, entrada, salida, excluir_reserva_id=reserva.pk
         ):
             messages.error(request, 'La habitación no está disponible para esas fechas.')
-            return render(request, 'editar_reserva.html', contexto_edicion())
+            return render(request, 'reservas/editar_reserva.html', contexto_edicion())
         datos, errores = _datos_acompanantes_post(request, total)
         docs = [reserva.huesped.numero_documento] + [x['numero_documento'] for x in datos]
         if errores or len(set(docs)) != len(docs):
             messages.error(request, errores[0] if errores else 'Los documentos de los huéspedes deben ser distintos.')
-            return render(request, 'editar_reserva.html', contexto_edicion())
+            return render(request, 'reservas/editar_reserva.html', contexto_edicion())
         with transaction.atomic():
             r = Reserva.objects.select_for_update().select_related('habitacion__tipo').get(pk=reserva.pk)
             if r.estado != 'CONFIRMADA':
@@ -1255,7 +1255,7 @@ def editar_reserva(request, reserva_id):
                 habitacion_bloqueada, entrada, salida, excluir_reserva_id=r.pk
             ):
                 messages.error(request, 'La habitación dejó de estar disponible para esas fechas. No se guardaron los cambios; revisa las fechas e inténtalo de nuevo.')
-                return render(request, 'editar_reserva.html', contexto_edicion())
+                return render(request, 'reservas/editar_reserva.html', contexto_edicion())
             r.fecha_entrada, r.fecha_salida = entrada, salida
             r.num_adultos, r.num_ninos, r.num_huespedes = adultos, ninos, total
             r.valor_total = r.calcular_alojamiento()
@@ -1264,7 +1264,7 @@ def editar_reserva(request, reserva_id):
             for item in datos: Acompanante.objects.create(reserva=r, **item)
         messages.success(request, f'Reserva #{r.id} actualizada.')
         return redirect('listar_reservas')
-    return render(request, 'editar_reserva.html', contexto_edicion())
+    return render(request, 'reservas/editar_reserva.html', contexto_edicion())
 
 
 @requiere_rol('ADMIN_GERENTE', 'RECEPCIONISTA')
@@ -1303,7 +1303,7 @@ def listar_huespedes(request):
             Q(correo__icontains=busqueda)
         )
 
-    return render(request, 'huespedes.html', {
+    return render(request, 'huespedes/listado_huespedes.html', {
         'huespedes': huespedes,
         'busqueda': busqueda
     })
@@ -1325,7 +1325,7 @@ def crear_huesped(request):
         # Verificar si el documento ya existe
         if Huesped.objects.filter(numero_documento=num_doc).exists():
             messages.error(request, f"Ya existe un huésped registrado con el documento N° {num_doc}.")
-            return render(request, 'form_huesped.html', {'huesped': request.POST})
+            return render(request, 'huespedes/formulario_huesped.html', {'huesped': request.POST})
 
         Huesped.objects.create(
             tipo_documento=request.POST.get('tipo_documento'),
@@ -1339,7 +1339,7 @@ def crear_huesped(request):
         messages.success(request, "Huésped registrado correctamente.")
         return redirect('listar_huespedes')
 
-    return render(request, 'form_huesped.html')
+    return render(request, 'huespedes/formulario_huesped.html')
 #endregion
 
 
@@ -1360,7 +1360,7 @@ def editar_huesped(request, huesped_id):
         # Validar duplicados si cambia de documento
         if Huesped.objects.filter(numero_documento=num_doc).exclude(id=huesped.id).exists():
             messages.error(request, f"El documento N° {num_doc} pertenece a otro huésped.")
-            return render(request, 'form_huesped.html', {'huesped': huesped})
+            return render(request, 'huespedes/formulario_huesped.html', {'huesped': huesped})
 
         huesped.tipo_documento = request.POST.get('tipo_documento')
         huesped.numero_documento = num_doc
@@ -1374,7 +1374,7 @@ def editar_huesped(request, huesped_id):
         messages.success(request, f"Información del huésped {huesped.nombres} actualizada exitosamente.")
         return redirect('listar_huespedes')
 
-    return render(request, 'form_huesped.html', {'huesped': huesped})
+    return render(request, 'huespedes/formulario_huesped.html', {'huesped': huesped})
 #endregion
 
 
@@ -1390,7 +1390,7 @@ def detalle_huesped(request, huesped_id):
     huesped = get_object_or_404(Huesped, pk=huesped_id)
     reservas = Reserva.objects.filter(huesped=huesped).select_related('habitacion').order_by('-id')
 
-    return render(request, 'detalle_huesped.html', {
+    return render(request, 'huespedes/detalle_huesped.html', {
         'huesped': huesped,
         'reservas': reservas
     })
@@ -1519,7 +1519,7 @@ def listar_usuarios(request):
             Q(rol__icontains=busqueda)
         )
 
-    return render(request, 'usuarios.html', {
+    return render(request, 'usuarios/listado_usuarios.html', {
         'usuarios': usuarios,
         'busqueda': busqueda
     })
@@ -1532,7 +1532,7 @@ def crear_usuario(request):
         if errores:
             for error in errores:
                 messages.error(request, error)
-            return render(request, 'form_usuario.html', {'datos': request.POST})
+            return render(request, 'usuarios/formulario_usuario.html', {'datos': request.POST})
         
         Usuario.objects.create(
             nombres=datos['nombres'],
@@ -1545,7 +1545,7 @@ def crear_usuario(request):
         messages.success(request, "Usuario y credenciales creados exitosamente.")
         return redirect('listar_usuarios')
 
-    return render(request, 'form_usuario.html')
+    return render(request, 'usuarios/formulario_usuario.html')
 
 
 @requiere_rol('ADMIN_GERENTE')
@@ -1557,7 +1557,7 @@ def editar_usuario(request, usuario_id):
         if errores:
             for error in errores:
                 messages.error(request, error)
-            return render(request, 'form_usuario.html', {
+            return render(request, 'usuarios/formulario_usuario.html', {
                 'usuario_item': usuario_item,
                 'datos': request.POST,
             })
@@ -1581,7 +1581,7 @@ def editar_usuario(request, usuario_id):
         messages.success(request, f"Usuario {usuario_item.nombres} actualizado correctamente.")
         return redirect('listar_usuarios')
 
-    return render(request, 'form_usuario.html', {'usuario_item': usuario_item})
+    return render(request, 'usuarios/formulario_usuario.html', {'usuario_item': usuario_item})
 
 
 @requiere_rol('ADMIN_GERENTE')

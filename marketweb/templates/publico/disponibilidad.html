@@ -56,7 +56,7 @@
                             </div>
                         </div>
                         <div>
-                            <a href="{% url 'crear_reserva' hab.id %}?fecha_entrada={{ f_entrada|urlencode }}&amp;fecha_salida={{ f_salida|urlencode }}&amp;num_adultos={{ num_adultos }}&amp;num_ninos={{ num_ninos }}&amp;trae_mascota={{ trae_mascota|yesno:'True,False' }}" 
+                            <a href="{% url 'crear_reserva' hab.id %}" 
                                 class="btn btn-sm btn-success w-100 fw-bold py-2"><i class="bi bi-journal-plus"></i> Reservar Suite</a>
                         </div>
                     </div>
